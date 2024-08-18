@@ -1,11 +1,12 @@
 import json
+import re
 
 from django.db import IntegrityError
 from django.http import JsonResponse
 from django.views import View
 from django.utils.html import escape
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth import login
+from django.contrib.auth import login, authenticate, logout
 from django.utils.decorators import method_decorator
 
 from my_auth.models import EmailConfirmationToken, CustomUser
@@ -60,3 +61,71 @@ class CreateAccountView(View):
                 elif 'username' in str(e):
                     return JsonResponse({'success': False, 'message': 'Full name already taken.'})
             return JsonResponse({'success': False, 'message': 'An unexpected error occurred. Please try again.'})
+
+
+def validate_email(email):
+    """Validate email format."""
+    email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(email_pattern, email) is not None
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class LoginView(View):
+    def post(self, request, *args, **kwargs):
+        print("Received a POST request.")
+        try:
+            # Parse JSON request body
+            data = json.loads(request.body)
+            print(f"Parsed data: {data}")
+
+            email = data.get('email', '').strip()  # Strip leading/trailing whitespace from email
+            password = data.get('password', '')  # Do not strip password
+            print(f"Email: {email}")
+            print(f"Password: {'*' * len(password) if password else 'Not provided'}")
+
+            # Validate email format
+            if not validate_email(email):
+                print("Invalid email format.")
+                return JsonResponse({'error': 'Invalid email format.'}, status=400)
+
+            # Validate that email and password are not empty
+            if not email or not password:
+                print("Email or password is empty.")
+                return JsonResponse({'error': 'Email and password are required.'}, status=400)
+
+            # Authenticate user
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                print("User authenticated successfully.")
+
+                # User is authenticated, log them in to create a session
+                login(request, user)
+
+                # Get the session key from the request
+                session_key = request.session.session_key
+                print(f"Session key: {session_key}")
+
+                # Create a response and set the session key in a cookie
+                response = JsonResponse({'success': 'Authenticated successfully.'})
+                response.set_cookie('sessionid', session_key, httponly=True, secure=False)
+
+                return response
+            else:
+                print("Invalid email or password.")
+                # Do not specify whether email or password is incorrect
+                return JsonResponse({'error': 'Invalid email or password.'}, status=400)
+        except json.JSONDecodeError:
+            print("Error decoding JSON.")
+            return JsonResponse({'error': 'Invalid request format.'}, status=400)
+        except Exception as e:
+            # Log unexpected errors for debugging
+            print(f'Unexpected error: {e}')
+            return JsonResponse({'error': 'An unexpected error occurred.'}, status=500)
+
+
+@csrf_exempt
+def sign_out_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({'success': True})
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
