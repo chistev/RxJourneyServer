@@ -9,8 +9,6 @@ class Post(models.Model):
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True)
-    comment_count = models.PositiveIntegerField(default=0)  # Renamed field
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -20,14 +18,10 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    @property
-    def total_likes(self):
-        return self.likes.count()
-
 
 class Subscriber(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    email = models.EmailField(unique=True, blank=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.user.email} subscribed on {self.subscribed_at}'
+        return f'{self.email} subscribed on {self.subscribed_at}'

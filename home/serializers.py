@@ -22,23 +22,12 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class PostSerializer(serializers.ModelSerializer):
-    comments = CommentSerializer(many=True, read_only=True)
-    total_likes = serializers.SerializerMethodField()
-    liked = serializers.SerializerMethodField()
-
     class Meta:
         model = Post
-        fields = ['id', 'title', 'image', 'slug', 'content', 'created_at', 'total_likes', 'comments', 'liked']
-
-    def get_total_likes(self, obj):
-        return obj.total_likes
-
-    def get_liked(self, obj):
-        request = self.context.get('request')
-        return request.user in obj.likes.all()
+        fields = ['id', 'title', 'image', 'slug', 'content', 'created_at']
 
 
 class SubscriberSerializer(serializers.ModelSerializer):
     class Meta:
         model = Subscriber
-        fields = ['id', 'user', 'subscribed_at']
+        fields = ['id', 'email', 'subscribed_at']

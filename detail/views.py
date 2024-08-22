@@ -147,7 +147,7 @@ def random_posts(request, slug):
             'slug': post.slug,
             'image': post.image.url if post.image else None,
             'created_at': post.created_at,
-            'content': post.content[:150] + '...',  # Trim content for preview
+            'content': post.content[:300] + '...',  # Trim content for preview
             'likes': post.total_likes,
             'comments': post.comment_count,
         }
