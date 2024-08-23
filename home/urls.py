@@ -11,4 +11,5 @@ urlpatterns = [
     path('unsubscribe/', UnsubscribeView.as_view(), name='unsubscribe'),
     path('check-subscription/', CheckSubscriptionView.as_view(), name='check-subscription'),
     path('search/', SearchResultsView.as_view(), name='search_results'),
+    path('validate-token/', SubscribeView.as_view(), name='validate-token'),
 ]

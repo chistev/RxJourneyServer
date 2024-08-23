@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
 from django.core.validators import validate_email
 from django.db.models import Q
+from django.http import JsonResponse
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -129,19 +130,25 @@ class SubscribeView(APIView):
         else:
             print(f"Failed to send confirmation email. Response: {response.text}")
 
-    def confirm_subscription(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         token = request.query_params.get('token')
         if not token:
-            return Response({'message': 'Invalid or missing token'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'valid': False, 'message': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         signer = TimestampSigner()
         try:
             # Verify token and check expiration (1 hour)
             email = signer.unsign(token, max_age=3600)
-            Subscriber.objects.create(email=email)
-            return Response({'message': 'Subscription confirmed'}, status=status.HTTP_201_CREATED)
+
+            # Save the confirmed email as a subscriber
+            if not Subscriber.objects.filter(email=email).exists():
+                Subscriber.objects.create(email=email)
+                return JsonResponse({'valid': True, 'message': 'Subscription confirmed and saved!'}, status=status.HTTP_200_OK)
+            else:
+                return JsonResponse({'valid': True, 'message': 'Subscription already confirmed.'}, status=status.HTTP_200_OK)
+
         except (BadSignature, SignatureExpired):
-            return Response({'message': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+            return JsonResponse({'valid': False, 'message': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UnsubscribeView(APIView):
