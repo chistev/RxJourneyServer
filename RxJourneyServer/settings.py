@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_social_oauth2',
     'my_auth',
-    'settings',
     'home',
     'detail',
     'corsheaders',
@@ -161,4 +160,3 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'my_auth.CustomUser'
