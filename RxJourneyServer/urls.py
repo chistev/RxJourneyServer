@@ -8,8 +8,9 @@ urlpatterns = [
     path('', include('my_auth.urls')),
     path('home/', include('home.urls')),
     path('detail/', include('detail.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
-# Serve media files during development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += [
+    path("ckeditor5/", include('django_ckeditor_5.urls'), name="ck_editor_5_upload_file"),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
