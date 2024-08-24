@@ -95,25 +95,12 @@ WSGI_APPLICATION = 'RxJourneyServer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASE_URL = env('DATABASE_URL')
-
-
-def parse_database_url(url):
-    result = urlparse(url)
-    return {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': result.path[1:],  # Strip the leading '/' from the path
-        'USER': result.username,
-        'PASSWORD': result.password,
-        'HOST': result.hostname,
-        'PORT': result.port,
-    }
-
-
 DATABASES = {
-    'default': parse_database_url(DATABASE_URL)
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
