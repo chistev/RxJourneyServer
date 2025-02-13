@@ -24,7 +24,7 @@ def send_post_notification(subject, post_title, post_excerpt, post_slug):
             <p>We have a new post on our blog!<br><br>
             <strong>{post_title}</strong></p>
             <p>{post_excerpt}</p>
-            <p><a href="http://localhost:5173/{post_slug}">Read more</a></p>
+            <p><a href="https://rxjourney.com.ng/{post_slug}">Read more</a></p>
         </body>
         </html>
         """
