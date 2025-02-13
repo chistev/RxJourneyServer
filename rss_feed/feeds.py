@@ -1,12 +1,11 @@
 from django.contrib.syndication.views import Feed
-from django.urls import reverse
 
 from home.models import Post
 
 
 class LatestPostsFeed(Feed):
-    title = "Latest Blog Posts"
-    link = "/rss/"
+    title = "RXJOURNEY BLOG POSTS"
+    link = "/rss_feed/rss/"
     description = "Updates on new blog posts"
 
     def items(self):
@@ -19,4 +18,4 @@ class LatestPostsFeed(Feed):
         return item.get_excerpt()
 
     def item_link(self, item):
-        return reverse('post_detail', args=[item.slug])
+        return f'https://rxjourney.com.ng/{item.slug}/'

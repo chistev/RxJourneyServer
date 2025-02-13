@@ -24,7 +24,7 @@ SECRET_KEY = env('SECRET_KEY')
 # DEBUG = True
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['rxjourneyserver.pythonanywhere.com']
+ALLOWED_HOSTS = ['rxjourneyserver.pythonanywhere.com', 'localhost']
 
 
 # Application definition
