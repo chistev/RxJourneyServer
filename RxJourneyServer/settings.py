@@ -4,7 +4,7 @@ import environ
 
 # Initialize environment variables
 env = environ.Env(
-    DEBUG=(bool, False),
+    DEBUG=(bool, True),
     SECRET_KEY=str
 )
 
@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'detail',
     'corsheaders',
     'django_ckeditor_5',
+    'rss_feed',
 ]
 
 AUTHENTICATION_BACKENDS = (

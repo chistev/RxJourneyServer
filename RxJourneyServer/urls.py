@@ -8,6 +8,7 @@ urlpatterns = [
     path('', include('my_auth.urls')),
     path('home/', include('home.urls')),
     path('detail/', include('detail.urls')),
+    path('rss_feed/', include('rss_feed.urls')),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
