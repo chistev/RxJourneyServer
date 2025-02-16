@@ -1,5 +1,6 @@
 from django.db.models import Q
 from rest_framework import generics, status
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
@@ -9,10 +10,15 @@ from .email_utils import generate_confirmation_token, send_confirmation_email
 from .subscriptions import validate_email_address, check_email_exists, confirm_subscription
 
 
+class PostPagination(PageNumberPagination):
+    page_size = 10  # Return 10 posts per page
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class PostListView(generics.ListAPIView):
     queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
-
+    pagination_class = PostPagination
 
 class PostDetailView(generics.RetrieveAPIView):
     queryset = Post.objects.all()
