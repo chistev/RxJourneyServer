@@ -23,9 +23,9 @@ def send_confirmation_email(email, token):
     <p>Hello,</p>
     <p>Please click the link below to confirm your subscription.<br>
     This link will expire in 1 hour.</p>
-    <p><a href="https://rxjourney.com.ng/confirm-email?token={token}">Confirm Subscription</a></p>
+    <p><a href="https://rxjourney.net/confirm-email?token={token}">Confirm Subscription</a></p>
     <p>If the button above doesn’t work, paste this link into your web browser:<br>
-    https://rxjourney.com.ng/confirm-email?token={token}</p>
+    https://rxjourney.net/confirm-email?token={token}</p>
     """
 
     payload = {

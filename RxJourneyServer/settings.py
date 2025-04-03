@@ -67,8 +67,8 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',  # Local development
     'https://rxjourney.onrender.com',  # Production
-    'https://rxjourney.com.ng',  # Production
-    'https://www.rxjourney.com.ng',  # Production with www
+    'https://rxjourney.net',  # Production
+    'https://www.rxjourney.net',  # Production with www
 ]
 
 # Trusted origins for CSRF protection

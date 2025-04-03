@@ -18,4 +18,4 @@ class LatestPostsFeed(Feed):
         return item.get_excerpt()
 
     def item_link(self, item):
-        return f'https://rxjourney.com.ng/{item.slug}/'
+        return f'https://rxjourney.net/{item.slug}/'
