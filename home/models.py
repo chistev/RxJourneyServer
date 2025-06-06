@@ -13,30 +13,18 @@ class Post(models.Model):
     content = CKEditor5Field('Text', config_name='extends')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def get_excerpt(self, word_limit=100):
-        # Strip HTML tags from content
-        plain_text_content = strip_tags(self.content)
-
-        # Replace HTML entities like &nbsp; with a space
-        plain_text_content = plain_text_content.replace('&nbsp;', ' ')
-
-        # Split the content into words
-        words = re.findall(r'\b\w+\b', plain_text_content)
-
-        # Limit the number of words
-        truncated_words = words[:word_limit]
-
-        # Join words back into a string and add ellipsis if truncated
-        truncated_content = ' '.join(truncated_words)
-        return f"{truncated_content}..." if len(words) > word_limit else truncated_content
+    def get_excerpt(self, char_limit=300):
+        # Return the first 'char_limit' characters of the raw HTML content
+        if len(self.content) > char_limit:
+            return self.content[:char_limit] + "..."
+        return self.content
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new:
             post_excerpt = self.get_excerpt()
-            subject = f"New Post: {self.title}"
-            send_post_notification(subject, self.title, post_excerpt, self.slug)
+            send_post_notification(self.title, post_excerpt, self.slug)
 
     def __str__(self):
         return self.title
