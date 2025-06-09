@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Subscriber
+from .models import Post, Subscriber, UnsubscribeToken
 
 
 @admin.register(Post)
@@ -15,3 +15,10 @@ class SubscriberAdmin(admin.ModelAdmin):
     list_display = ('email', 'subscribed_at')
     search_fields = ('email',)
     list_filter = ('subscribed_at',)
+
+
+@admin.register(UnsubscribeToken)
+class UnsubscribeTokenAdmin(admin.ModelAdmin):
+    list_display = ('email', 'token', 'created_at', 'unsubscribed')
+    search_fields = ('email', 'token')
+    list_filter = ('unsubscribed', 'created_at')

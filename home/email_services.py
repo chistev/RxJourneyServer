@@ -2,7 +2,7 @@ import os
 import requests
 
 def send_post_notification(post_title, post_excerpt, post_slug):
-    from .models import Subscriber
+    from .models import Subscriber, UnsubscribeToken
 
     api_key = os.environ.get('BREVO_API_KEY')
     if not api_key:
@@ -17,6 +17,8 @@ def send_post_notification(post_title, post_excerpt, post_slug):
     recipient_emails = [subscriber.email for subscriber in subscribers]
 
     for email in recipient_emails:
+        token = UnsubscribeToken.objects.create(email=email)
+        unsubscribe_link = f"https://rxjourneyserver.pythonanywhere.com/home/unsubscribe?token={token.token}"
         payload = {
             "sender": {
                 "name": sender_name,
@@ -31,7 +33,8 @@ def send_post_notification(post_title, post_excerpt, post_slug):
             "params": {
                 "title": post_title,
                 "excerpt": post_excerpt,
-                "slug": post_slug
+                "slug": post_slug,
+                "unsubscribe_link": unsubscribe_link
             }
         }
 

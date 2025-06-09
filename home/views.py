@@ -4,10 +4,13 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.http import JsonResponse
-from .models import Post, Subscriber
+from .models import Post, Subscriber, UnsubscribeToken
 from .serializers import PostSerializer
 from .email_utils import generate_confirmation_token, send_confirmation_email
 from .subscriptions import validate_email_address, check_email_exists, confirm_subscription
+
+from django.shortcuts import redirect
+from django.views import View
 
 
 class PostPagination(PageNumberPagination):
@@ -75,6 +78,30 @@ class UnsubscribeView(APIView):
             subscriber.delete()
             return Response({'message': 'Unsubscribed successfully'}, status=status.HTTP_204_NO_CONTENT)
         return Response({'message': 'Not subscribed'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class HandleUnsubscribeView(View):
+    def get(self, request):
+        token_value = request.GET.get('token')
+        if not token_value:
+            return redirect('https://rxjourney.net/unsubscribe/invalid')
+
+        try:
+            token = UnsubscribeToken.objects.get(token=token_value)
+        except UnsubscribeToken.DoesNotExist:
+            return redirect('https://rxjourney.net/unsubscribe/invalid')
+
+        if token.is_expired():
+            return redirect('https://rxjourney.net/unsubscribe/expired')
+
+        if token.unsubscribed:
+            return redirect('https://rxjourney.net/unsubscribe/already')
+
+        Subscriber.objects.filter(email=token.email).delete()
+        token.unsubscribed = True
+        token.save()
+
+        return redirect('https://rxjourney.net/unsubscribe/success')
 
 
 class SearchResultsView(APIView):

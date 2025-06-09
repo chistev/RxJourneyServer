@@ -1,10 +1,10 @@
 from django.db import models
-from django.utils.html import strip_tags
-from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 from home.email_services import send_post_notification
-import re
 
+import uuid
+from django.utils import timezone
+from datetime import timedelta
 
 class Post(models.Model):
     title = models.CharField(max_length=255)
@@ -13,7 +13,7 @@ class Post(models.Model):
     content = CKEditor5Field('Text', config_name='extends')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def get_excerpt(self, char_limit=300):
+    def get_excerpt(self, char_limit=400):
         # Return the first 'char_limit' characters of the raw HTML content
         if len(self.content) > char_limit:
             return self.content[:char_limit] + "..."
@@ -36,3 +36,16 @@ class Subscriber(models.Model):
 
     def __str__(self):
         return f'{self.email} subscribed on {self.subscribed_at}'
+
+
+class UnsubscribeToken(models.Model):
+    email = models.EmailField()
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    unsubscribed = models.BooleanField(default=False)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(hours=24)
+
+    def __str__(self):
+        return f"{self.email} - {self.token}"
