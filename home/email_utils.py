@@ -15,8 +15,9 @@ def send_confirmation_email(email, token):
         raise ValueError("API key not found. Please set the 'BREVO_API_KEY' environment variable.")
 
     api_url = 'https://api.brevo.com/v3/smtp/email'
-    sender_email = 'stephenowabie@gmail.com'
+    sender_email = 'stephen@rxjourney.net'
     sender_name = 'Chistev'
+    reply_to_email = 'chistev12@gmail.com'
 
     subject = "Confirm Your Subscription"
     html_content = f"""
@@ -32,6 +33,9 @@ def send_confirmation_email(email, token):
         "sender": {
             "name": sender_name,
             "email": sender_email,
+        },
+        "replyTo": {
+            "email": reply_to_email
         },
         "to": [
             {
@@ -51,6 +55,6 @@ def send_confirmation_email(email, token):
     response = requests.post(api_url, data=json.dumps(payload), headers=headers)
 
     if response.status_code == 201:
-        print("Confirmation email sent successfully.")
+        print("✅ Confirmation email sent successfully.")
     else:
-        print(f"Failed to send confirmation email. Response: {response.text}")
+        print(f"❌ Failed to send confirmation email. Response: {response.text}")

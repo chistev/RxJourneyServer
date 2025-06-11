@@ -9,8 +9,9 @@ def send_post_notification(post_title, post_excerpt, post_slug):
         raise ValueError("API key not found. Please set the 'BREVO_API_KEY' environment variable.")
 
     api_url = 'https://api.brevo.com/v3/smtp/email'
-    sender_email = 'stephenowabie@gmail.com'
+    sender_email = 'stephen@rxjourney.net'
     sender_name = 'Chistev'
+    reply_to_email = 'chistev12@gmail.com'
     brevo_template_id = 12
 
     subscribers = Subscriber.objects.all()
@@ -19,10 +20,14 @@ def send_post_notification(post_title, post_excerpt, post_slug):
     for email in recipient_emails:
         token = UnsubscribeToken.objects.create(email=email)
         unsubscribe_link = f"https://rxjourneyserver.pythonanywhere.com/home/unsubscribe?token={token.token}"
+
         payload = {
             "sender": {
                 "name": sender_name,
                 "email": sender_email,
+            },
+            "replyTo": {
+                "email": reply_to_email
             },
             "to": [
                 {
