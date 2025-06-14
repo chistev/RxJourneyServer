@@ -12,6 +12,9 @@ from .subscriptions import validate_email_address, check_email_exists, confirm_s
 from django.shortcuts import redirect
 from django.views import View
 
+import requests
+import os
+
 
 class PostPagination(PageNumberPagination):
     page_size = 10  # Return 10 posts per page
@@ -43,6 +46,22 @@ class SubscriberCountView(APIView):
 class SubscribeView(APIView):
     def post(self, request, *args, **kwargs):
         email = request.data.get('email', '').strip()
+        recaptcha_token = request.data.get('recaptcha_token')
+
+        recaptcha_secret = os.environ.get('RECAPTCHA_SECRET_KEY')
+
+        recaptcha_response = requests.post(
+            'https://www.google.com/recaptcha/api/siteverify',
+            data={
+                'secret': recaptcha_secret,
+                'response': recaptcha_token
+            }
+        )
+        result = recaptcha_response.json()
+
+        if not result.get('success') or result.get('score', 0) < 0.5:
+            return Response({'message': 'reCAPTCHA verification failed'}, status=status.HTTP_400_BAD_REQUEST)
+
 
         # Validate email format
         is_valid, error_message = validate_email_address(email)
