@@ -49,3 +49,6 @@ class UnsubscribeToken(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.token}"
+    
+    class Meta:
+        verbose_name_plural = "Unsubscribed Users"

@@ -22,3 +22,7 @@ class UnsubscribeTokenAdmin(admin.ModelAdmin):
     list_display = ('email', 'token', 'created_at', 'unsubscribed')
     search_fields = ('email', 'token')
     list_filter = ('unsubscribed', 'created_at')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(unsubscribed=True)
