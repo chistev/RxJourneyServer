@@ -1,9 +1,10 @@
 import os
+import json
 import requests
+from .models import Subscriber, UnsubscribeToken
 
-def send_post_notification(post_title, post_excerpt, post_slug):
-    from .models import Subscriber, UnsubscribeToken
 
+def send_post_notification(post_title, post_slug):
     api_key = os.environ.get('BREVO_API_KEY')
     if not api_key:
         raise ValueError("API key not found. Please set the 'BREVO_API_KEY' environment variable.")
@@ -12,7 +13,8 @@ def send_post_notification(post_title, post_excerpt, post_slug):
     sender_email = 'stephen@rxjourney.net'
     sender_name = 'Chistev'
     reply_to_email = 'chistev12@gmail.com'
-    brevo_template_id = 12
+
+    subject = f"New Post: {post_title}"
 
     subscribers = Subscriber.objects.all()
     recipient_emails = [subscriber.email for subscriber in subscribers]
@@ -20,6 +22,16 @@ def send_post_notification(post_title, post_excerpt, post_slug):
     for email in recipient_emails:
         token = UnsubscribeToken.objects.create(email=email)
         unsubscribe_link = f"https://rxjourneyserver.pythonanywhere.com/home/unsubscribe?token={token.token}"
+        post_link = f"https://rxjourney.net/{post_slug}"
+
+        html_content = f"""
+        <p>Hello,</p>
+        <p>We have a new post on our blog:</p>
+        <p><strong>{post_title}</strong></p>
+        <p><a href="{post_link}">Read the full post here</a></p>
+        <p>If you no longer wish to receive these notifications, <a href="{unsubscribe_link}">unsubscribe here</a>.</p>
+        <p>Thank you,<br>Chistev</p>
+        """
 
         payload = {
             "sender": {
@@ -34,13 +46,8 @@ def send_post_notification(post_title, post_excerpt, post_slug):
                     "email": email
                 }
             ],
-            "templateId": brevo_template_id,
-            "params": {
-                "title": post_title,
-                "excerpt": post_excerpt,
-                "slug": post_slug,
-                "unsubscribe_link": unsubscribe_link
-            }
+            "subject": subject,
+            "htmlContent": html_content
         }
 
         headers = {
@@ -49,9 +56,10 @@ def send_post_notification(post_title, post_excerpt, post_slug):
             'api-key': api_key
         }
 
-        response = requests.post(api_url, json=payload, headers=headers)
+        response = requests.post(api_url, data=json.dumps(payload), headers=headers)
 
         if response.status_code == 201:
             print(f"✅ Notification email sent successfully to {email}.")
         else:
             print(f"❌ Failed to send notification email to {email}. Response: {response.text}")
+            

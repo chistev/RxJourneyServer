@@ -1,7 +1,5 @@
 from django.db import models
 from django_ckeditor_5.fields import CKEditor5Field
-from home.email_services import send_post_notification
-
 import uuid
 from django.utils import timezone
 from datetime import timedelta
@@ -23,8 +21,8 @@ class Post(models.Model):
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new:
-            post_excerpt = self.get_excerpt()
-            send_post_notification(self.title, post_excerpt, self.slug)
+            from home.email_services import send_post_notification
+            send_post_notification(self.title, self.slug)
 
     def __str__(self):
         return self.title
